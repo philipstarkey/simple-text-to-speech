@@ -46,6 +46,14 @@
       align-items: center; */
     }
 
+    #settings {
+        overflow: auto;
+    }
+    
+    #settings_wrapper {
+        padding: 30px;
+    }
+
     #common_word_group>button.hidden {
         display: none;
     }
@@ -164,33 +172,45 @@
 <body style="max-height: 100%">
   <!-- Swiper -->
     <div id="tts_outer">
-        <table style="height: 100%">
+        <table style="height: 100%; width:100%;">
             <tr>
-                <td width="100%">
+                <td width="80%">
                     <div class="scrollable" id="tts_scroll"><span class="tts_size">Text to say: <span id="text_to_say">
                         <!-- Testing! A really long message that I will delete later but this is useful for testing... it needs to be even longer! Wow such a long message :) -->
                     </span></span></div>
                 </td>
-                <td><span id="play" class="letters">►</span></td>
+                <td width="20%" id="play">
+                    <!-- <span id="play" class="letters">►</span> -->
+                    <div>
+                        <img src="play_icon.svg" style="display: block; max-height: 100%; max-width:100%" />
+                    </div>
+                </td>
             </tr>
         </table>
     </div>
     <div class="swiper-container">
         <div class="swiper-wrapper">
             <div class="swiper-slide" id="settings">
-                <h1>Settings</h1>
-                <div><p>Note: These sliders can't be dragged. Just touch the point on the bar you want to set it to instead!</p></div>
-                <h3>"Text to say" font size</h3>
-                <div id="tts_font_size_slider">
-                    <div id="tts_font_size_custom-handle" class="ui-slider-handle"></div>
-                </div>
-                <h3>"Letter button" font size</h3>
-                <div id="font_size_slider">
-                    <div id="font_size_custom-handle" class="ui-slider-handle"></div>
-                </div>
-                <h3>"Word selection" font size</h3>
-                <div id="words_font_size_slider">
-                    <div id="words_font_size_custom-handle" class="ui-slider-handle"></div>
+                <div id="settings_wrapper">
+                    <h1>Settings</h1>
+                    <div><p>Note: These sliders can't be dragged. Just touch the point on the bar you want to set it to instead!</p></div>
+                    <h3>"Text to say" font size</h3>
+                    <div id="tts_font_size_slider">
+                        <div id="tts_font_size_custom-handle" class="ui-slider-handle"></div>
+                    </div>
+                    <h3>"Letter button" font size</h3>
+                    <div id="font_size_slider">
+                        <div id="font_size_custom-handle" class="ui-slider-handle"></div>
+                    </div>
+                    <h3>"Word selection" font size</h3>
+                    <div id="words_font_size_slider">
+                        <div id="words_font_size_custom-handle" class="ui-slider-handle"></div>
+                    </div>
+                    <div>
+                        <br />
+                        <br />
+                        <br />
+                    </div>
                 </div>
             </div>
             <div class="swiper-slide" id="letters">
