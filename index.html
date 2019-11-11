@@ -180,6 +180,8 @@
                                 <li>Selecting a word automatically adds a space afterwards so you don't need to</li>
                             </ul>
                             <li>Hit the play button to have your browser read out the sentence!</li>
+                            <li>⌫ Deletes a single character</li>
+                            <li>© Clears all text</li>
                         </ul>
                     </p>
                   </div>
@@ -278,6 +280,7 @@
     letters.push('&#x2334;');
     // letters.push('?');
     letters.push('⌫');
+    letters.push('©');
 
     $.each(letters, function(index, letter){
         $('#grid1').append('<div class="letters_div"><span class="letters">'+letter+'</span></div>');
@@ -319,6 +322,8 @@
                 $("#text_to_say").text($("#text_to_say").text().slice(0,-1));
             } else if (l == '⌴') {
                 $("#text_to_say").append(' ');
+            } else if (l == '©') {
+                $("#text_to_say").text('')
             } else {
                 $("#text_to_say").append(l);
             }
