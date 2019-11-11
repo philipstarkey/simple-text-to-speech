@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Simple text to speech</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+
+  <!-- Link Swiper's CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.1/css/swiper.min.css">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+  <!-- Demo styles -->
+  <style>
+    html, body {
+      position: relative;
+      height: 100%;
+    }
+    body {
+      background: #eee;
+      font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      color:#000;
+      margin: 0;
+      padding: 0;
+    }
+    .swiper-container {
+      width: 100%;
+      height: 80%;
+    }
+    .swiper-slide {
+      text-align: center;
+      font-size: 18px;
+      background: #fff;
+      /* Center slide text vertically */
+      /* display: -webkit-box;
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-pack: center;
+      -ms-flex-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      -webkit-align-items: center;
+      align-items: center; */
+    }
+
+    #common_word_group>button.hidden {
+        display: none;
+    }
+
+    #common_word_group {
+        overflow-y: auto;
+        overflow-x: hidden;
+        max-height:97%;
+    }
+
+    #letter_entry {
+        overflow: auto;
+        max-height:97%;
+    }
+
+    #tts_outer{
+        /* position:fixed;
+        width: 100%; */
+        height: 20%;
+        /* overflow: auto; */
+    }
+
+    /* From: https://stackoverflow.com/a/14136097 */
+    div.scrollable {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: auto;
+        
+    }
+
+    /* modified from: https://stackoverflow.com/a/49994351 and other answers on that page */
+    .grid {
+        display: grid;
+        grid-gap: 10px;
+        grid-template-columns: repeat(auto-fill, 186px);
+        justify-content: center;
+    }
+
+    .grid>* {
+        background-color: #4CAF50; /* Green background */
+        border: 1px solid green; /* Green border */
+        color: white;
+        height: 300px;
+        text-align: center;
+        justify-content: center; /* align horizontal */
+        align-items: center; /* align vertical */
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -moz-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-flex-align: center;
+        -ms-flex-align: center;
+        -webkit-align-items: center;
+        align-items: center;
+    }
+    .letters {
+        font-size: 100pt;
+    }
+    #letters.swiper-slide {
+        text-align: left;
+    }
+
+    /* From: https://jqueryui.com/slider/#custom-handle */
+    #font_size_custom-handle {
+        width: 3em;
+        height: 1.6em;
+        top: 50%;
+        margin-top: -.8em;
+        text-align: center;
+        line-height: 1.6em;
+    }
+    #tts_font_size_custom-handle, #words_font_size_custom-handle {
+        width: 3em;
+        height: 1.6em;
+        top: 50%;
+        margin-top: -.8em;
+        text-align: center;
+        line-height: 1.6em;
+    }
+
+    .btn-group button {
+        background-color: #4CAF50; /* Green background */
+        border: 1px solid green; /* Green border */
+        color: white; /* White text */
+        padding: 10px 24px; /* Some padding */
+        cursor: pointer; /* Pointer/hand icon */
+        width: 100%; /* Set a width if needed */
+        display: block; /* Make the buttons appear below each other */
+        font-size: 40pt;
+        margin: 2px;
+    }
+
+    .btn-group button:not(:last-child) {
+        border-bottom: none; /* Prevent double borders */
+    }
+
+    /* Add a background color on hover */
+    .btn-group button:hover {
+        background-color: #3e8e41;
+    }
+  </style>
+
+    <script
+        src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous"></script>
+    <script
+        src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+        integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@beta/dist/js.cookie.min.js"></script>
+</head>
+<body style="max-height: 100%">
+  <!-- Swiper -->
+    <div id="tts_outer">
+        <table style="height: 100%">
+            <tr>
+                <td width="100%">
+                    <div class="scrollable" id="tts_scroll"><span class="tts_size">Text to say: <span id="text_to_say">
+                        <!-- Testing! A really long message that I will delete later but this is useful for testing... it needs to be even longer! Wow such a long message :) -->
+                    </span></span></div>
+                </td>
+                <td><span id="play" class="letters">►</span></td>
+            </tr>
+        </table>
+    </div>
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide" id="settings">
+                <h1>Settings</h1>
+                <div><p>Note: These sliders can't be dragged. Just touch the point on the bar you want to set it to instead!</p></div>
+                <h3>"Text to say" font size</h3>
+                <div id="tts_font_size_slider">
+                    <div id="tts_font_size_custom-handle" class="ui-slider-handle"></div>
+                </div>
+                <h3>"Letter button" font size</h3>
+                <div id="font_size_slider">
+                    <div id="font_size_custom-handle" class="ui-slider-handle"></div>
+                </div>
+                <h3>"Word selection" font size</h3>
+                <div id="words_font_size_slider">
+                    <div id="words_font_size_custom-handle" class="ui-slider-handle"></div>
+                </div>
+            </div>
+            <div class="swiper-slide" id="letters">
+                <div id="letter_entry">
+                    
+                    <div class="grid" id="grid1">
+
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-slide" id="common-words">
+                <div class="btn-group" id="common_word_group">
+
+                </div>
+            </div>
+            <!-- <div class="swiper-slide" id="all-words">Slide 4</div> -->
+        </div>
+        <!-- Add Pagination -->
+        <div class="swiper-pagination"></div>
+    </div>
+
+  <!-- Swiper JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.1/js/swiper.min.js"></script>
+
+  <!-- Initialize Swiper -->
+  <script>
+
+    var swiper = new Swiper('.swiper-container', {
+        // autoHeight: true, //enable auto height
+        initialSlide: 1,
+        pagination: {
+            el: '.swiper-pagination',
+        },
+    });
+
+    // From: https://stackoverflow.com/a/43129507
+    function genCharArray(charA, charZ) {
+        var a = [], i = charA.charCodeAt(0), j = charZ.charCodeAt(0);
+        for (; i <= j; ++i) {
+            a.push(String.fromCharCode(i));
+        }
+        return a;
+    }
+    var letters = genCharArray('a', 'z');
+    letters.push('&#x2334;');
+    // letters.push('?');
+    letters.push('⌫');
+
+    $.each(letters, function(index, letter){
+        $('#grid1').append('<div class="letters_div"><span class="letters">'+letter+'</span></div>');
+    });
+
+
+    function update_common_words(str) {
+        var g = $("#common_word_group")
+        if (str.length > 0) {
+
+            var match_str = ''
+            for ( var i = 0; i < str.length; i++ )
+            {
+                match_str += '.word-'+(i+1)+'-'+str.charAt(i);
+            }
+            // g.children(".word").not(".word-"+str.length+"-"+str.slice(-1)).addClass("hidden");
+            g.children(".word").not(match_str).addClass("hidden");
+            // update the classes for the next letter
+            // g.children(".word-"+str.length+"-"+str.slice(-1)).each(function(index, element){
+            g.children(".word"+match_str).each(function(index, element){
+                var e = $(element);
+                var t = e.text().slice(str.length, str.length+1);
+                if (t.length) {
+                    e.addClass("word-"+(str.length+1)+"-"+t);
+                }
+                e.removeClass("hidden");
+            });
+        }
+        else
+        {
+            g.children(".word").removeClass("hidden")
+        }
+    }
+
+    $(".letters_div").each(function(index, element){
+        var h = $(element).click(function (event) {
+            var l = event.target.innerText;
+            if (l == '⌫') {
+                $("#text_to_say").text($("#text_to_say").text().slice(0,-1));
+            } else if (l == '⌴') {
+                $("#text_to_say").append(' ');
+            } else {
+                $("#text_to_say").append(l);
+            }
+            $("#tts_scroll").scrollTop($("#tts_scroll")[0].scrollHeight);
+
+            // update list of common words on page 3
+            var val = $("#text_to_say").text();
+            var s = val.substr(val.lastIndexOf(" ") + 1);
+            update_common_words(s);
+        })
+    });
+    
+    function updateLetterBoxes() {
+        var max_height = 0;
+        $(".letters").each(function(index, element)
+        {
+            var h = $(element).height();
+            if (h > max_height){
+                max_height = h;
+            }
+        });
+
+        $(".grid>*").each(function(index, element) {
+            $(element).css('height', max_height+'px')
+        });
+        $("#grid1").css('grid-template-columns', 'repeat(auto-fill, '+max_height+'px)')
+    }
+    
+    // load default values from cookies
+    var button_font_size = 90;
+    if (typeof Cookies.get('button_font_size') === "undefined") {
+        Cookies.set('button_font_size', button_font_size);
+    } else {
+        button_font_size = Cookies.get('button_font_size');
+    }
+    var tts_font_size = 40;
+    if (typeof Cookies.get('tts_font_size') === "undefined") {
+        Cookies.set('tts_font_size', tts_font_size);
+    } else {
+        tts_font_size = Cookies.get('tts_font_size');
+    }
+    var word_font_size = 40;
+    console.log(Cookies.get('word_font_size'))
+    if (typeof Cookies.get('word_font_size') === "undefined") {
+        Cookies.set('word_font_size', word_font_size);
+    } else {
+        word_font_size = Cookies.get('word_font_size');
+    }
+
+    var handle = $( "#font_size_custom-handle" );
+    $( "#font_size_slider" ).slider({
+        min: 20,
+        max: 300,
+        value: button_font_size,
+        create: function() {
+            handle.text( $( this ).slider( "value" ) );
+        },
+        slide: function( event, ui ) {
+            handle.text( ui.value );
+            $(".letters").css('font-size', ui.value+'pt');
+            setTimeout(updateLetterBoxes, 50);
+            Cookies.set('button_font_size',  ui.value);
+        }
+    });
+    setTimeout(updateLetterBoxes, 50);
+    
+    
+    var ttshandle = $( "#tts_font_size_custom-handle" );
+    var tts_slider = $( "#tts_font_size_slider" ).slider({
+        min: 20,
+        max: 300,
+        value: tts_font_size,
+        create: function() {
+            ttshandle.text( $( this ).slider( "value" ) );
+        },
+        slide: function( event, ui ) {
+            ttshandle.text( ui.value );
+            $(".tts_size").css('font-size', ui.value+'pt');
+            Cookies.set('tts_font_size',  ui.value);
+        }
+    });
+    setTimeout(function(){$(".tts_size").css('font-size', $('#tts_font_size_slider').slider("option", "value")+'pt');},50);
+    
+    var words_handle = $( "#words_font_size_custom-handle" );
+    var words_slider = $( "#words_font_size_slider" ).slider({
+        min: 20,
+        max: 300,
+        value: word_font_size,
+        create: function() {
+            words_handle.text( $( this ).slider( "value" ) );
+        },
+        slide: function( event, ui ) {
+            words_handle.text( ui.value );
+            $(".word").css('font-size', ui.value+'pt');
+            Cookies.set('word_font_size',  ui.value);
+        }
+    });
+    setTimeout(function(){$(".word").css('font-size', $('#words_font_size_slider').slider("option", "value")+'pt');},50);
+    
+    $("#play").click(function(event){
+        var msg = new SpeechSynthesisUtterance();
+        var voices = window.speechSynthesis.getVoices();
+        msg.voice = voices[0];
+        msg.voiceURI = "native";
+        msg.volume = 1;
+        msg.rate = 1;
+        msg.pitch = 0.8;
+        msg.text = $("#text_to_say").text();
+        msg.lang = 'en-UK';
+        window.speechSynthesis.speak(msg);
+        $("#text_to_say").text('')
+        update_common_words('');
+    });
+
+    function selectWord(event) {
+        var w = event.target.innerText;
+        var c = $("#text_to_say").text()
+        $("#text_to_say").text(c.slice(0,c.lastIndexOf(' ')+1) + w + " ");
+        swiper.slideTo(1);
+        update_common_words('');
+    }
+
+    // populate common words
+    $.getJSON( "common_words_10000.json", function( data ) {
+        $.each( data, function( key, val ) {
+            $("#common_word_group").append('<button class="word word-1-'+val.slice(0,1)+'">'+val+"</button>");
+        });
+        $("#common_word_group").children().each(function(index, element){
+            $(element).click(selectWord);
+        });
+    });
+  </script>
+</body>
+</html>
