@@ -170,6 +170,19 @@
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@beta/dist/js.cookie.min.js"></script>
 </head>
 <body style="max-height: 100%">
+            <div id="instructions" title="Instructions" style="display: none;">
+                    <p>
+                      <ul>
+                            <li>Swipe right to change font sizes</li>
+                            <li>Swipe left to access list of common words</li>
+                            <ul>
+                                <li>List of common words will be filtered by letters you type in (e.g. click "h" then "e" then "l", then swipe left to get to "hello")</li>
+                                <li>Selecting a word automatically adds a space afterwards so you don't need to</li>
+                            </ul>
+                            <li>Hit the play button to have your browser read out the sentence!</li>
+                        </ul>
+                    </p>
+                  </div>
   <!-- Swiper -->
     <div id="tts_outer">
         <table style="height: 100%; width:100%;">
@@ -193,6 +206,11 @@
             <div class="swiper-slide" id="settings">
                 <div id="settings_wrapper">
                     <h1>Settings</h1>
+                    <!-- <h3>Instructions</h3> -->
+                    <div id="settings_instructions">
+                        <a href="javascript:void(0);">Click to display instructions again</a>
+                    </div>
+                    <br />
                     <div><p>Note: These sliders can't be dragged. Just touch the point on the bar you want to set it to instead!</p></div>
                     <h3>"Text to say" font size</h3>
                     <div id="tts_font_size_slider">
@@ -231,6 +249,8 @@
         <!-- Add Pagination -->
         <div class="swiper-pagination"></div>
     </div>
+
+    
 
   <!-- Swiper JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.1/js/swiper.min.js"></script>
@@ -341,7 +361,6 @@
         tts_font_size = Cookies.get('tts_font_size');
     }
     var word_font_size = 40;
-    console.log(Cookies.get('word_font_size'))
     if (typeof Cookies.get('word_font_size') === "undefined") {
         Cookies.set('word_font_size', word_font_size);
     } else {
@@ -422,6 +441,29 @@
         update_common_words('');
     }
 
+    // display instructions on first use
+    function displayInstructions(){
+        $( function() {
+            $( "#instructions" ).dialog({
+                modal: true,
+                buttons: {
+                    Ok: function() {
+                    $( this ).dialog( "close" );
+                    }
+                },
+                open: function(event, ui) 
+                { 
+                    $('.ui-widget-overlay').bind('click', function () { $(this).siblings('.ui-dialog').find('.ui-dialog-content').dialog('close'); }); 
+                }
+            });
+        } );
+    }
+    if (typeof Cookies.get('display_instructions') === "undefined") {
+        Cookies.set('display_instructions', false);
+        displayInstructions();
+    }
+    $("#settings_instructions").click(displayInstructions);
+
     // populate common words
     $.getJSON( "common_words_10000.json", function( data ) {
         $.each( data, function( key, val ) {
@@ -431,6 +473,12 @@
             $(element).click(selectWord);
         });
     });
+
+    
+   
+
+   
+
   </script>
 </body>
 </html>
