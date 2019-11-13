@@ -158,6 +158,68 @@
         background-color: #3e8e41;
     }
   </style>
+  <style>
+    /* From: https://www.w3schools.com/howto/howto_css_switch.asp */
+    .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    }
+
+    .switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+    }
+
+    .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    }
+
+    .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    }
+
+    input:checked + .slider {
+    background-color: #2196F3;
+    }
+
+    input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+    border-radius: 34px;
+    }
+
+    .slider.round:before {
+    border-radius: 50%;
+    }
+  </style>
 
     <script
         src="https://code.jquery.com/jquery-3.4.1.min.js"
@@ -213,6 +275,13 @@
                         <a href="javascript:void(0);">Click to display instructions again</a>
                     </div>
                     <br />
+                    <h3>Enable landscape tablet mode (useful for iPads)</h3>
+                    <label class="switch">
+                        <input id="tablet_mode" type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <br />
+                    <br />
                     <div><p>Note: These sliders can't be dragged. Just touch the point on the bar you want to set it to instead!</p></div>
                     <h3>"Text to say" font size</h3>
                     <div id="tts_font_size_slider">
@@ -259,6 +328,14 @@
 
   <!-- Initialize Swiper -->
   <script>
+    
+    // get tablet mode
+    var tablet_mode = false;
+    if (typeof Cookies.get('tablet_mode') === "undefined") {
+        Cookies.set('tablet_mode', tablet_mode);
+    } else {
+        tablet_mode = Cookies.get('tablet_mode');
+    }
 
     var swiper = new Swiper('.swiper-container', {
         // autoHeight: true, //enable auto height
@@ -266,6 +343,7 @@
         pagination: {
             el: '.swiper-pagination',
         },
+        slidesPerView: tablet_mode ? 2 : 1
     });
 
     // From: https://stackoverflow.com/a/43129507
@@ -371,6 +449,16 @@
     } else {
         word_font_size = Cookies.get('word_font_size');
     }
+
+    // Settings widgets
+    $("#tablet_mode").change(function(event) {
+        var isChecked = $(this).is(':checked');
+        console.log(isChecked);
+        swiper.params.slidesPerView = isChecked ? 2 : 1;
+        Cookies.set('tablet_mode',  isChecked);
+        swiper.update();
+    });
+    $("#tablet_mode").prop("checked", tablet_mode);
 
     var handle = $( "#font_size_custom-handle" );
     $( "#font_size_slider" ).slider({
