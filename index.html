@@ -335,6 +335,10 @@
         Cookies.set('tablet_mode', tablet_mode);
     } else {
         tablet_mode = Cookies.get('tablet_mode');
+        if (typeof tablet_mode == "string")
+        {
+            tablet_mode = tablet_mode == "true" ? true : false;
+        }
     }
     console.log(tablet_mode);
 
