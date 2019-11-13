@@ -458,7 +458,10 @@
         Cookies.set('tablet_mode',  isChecked);
         swiper.update();
     });
-    $("#tablet_mode").prop("checked", tablet_mode);
+    if (tablet_mode)
+    {
+        $("#tablet_mode").prop("checked", tablet_mode);
+    }
 
     var handle = $( "#font_size_custom-handle" );
     $( "#font_size_slider" ).slider({
