@@ -454,13 +454,15 @@
     // Settings widgets
     $("#tablet_mode").change(function(event) {
         var isChecked = $(this).is(':checked');
+        console.log('Event')
         console.log(isChecked);
         swiper.params.slidesPerView = isChecked ? 2 : 1;
         Cookies.set('tablet_mode', isChecked);
         swiper.update();
     });
     if (tablet_mode)
-    {
+    {   
+        console.log('initial set')
         $("#tablet_mode").prop("checked", tablet_mode);
     }
 
